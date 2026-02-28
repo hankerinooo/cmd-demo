@@ -613,8 +613,8 @@
         <select id="p1-hero"></select>
       </div>
       <div class="field-group">
-        <label for="p1-gem">GEM Player ID</label>
-        <input type="text" id="p1-gem" placeholder="e.g. 12345">
+        <label for="p1-xp">Player XP</label>
+        <input type="text" id="p1-xp" placeholder="e.g. 12345">
       </div>
       <div class="score-row field-group">
         <label>Score</label>
@@ -638,8 +638,8 @@
         <select id="p2-hero"></select>
       </div>
       <div class="field-group">
-        <label for="p2-gem">GEM Player ID</label>
-        <input type="text" id="p2-gem" placeholder="e.g. 67890">
+        <label for="p2-xp">Player XP</label>
+        <input type="text" id="p2-xp" placeholder="e.g. 67890">
       </div>
     </div>
 
@@ -687,7 +687,7 @@
           <span class="lt-info-item" id="lt-format"><span>Classic Constructed</span></span>
           <span class="lt-info-dot"></span>
           <span class="lt-info-item">
-            GEM <span id="lt-gem-p1">—</span> vs <span id="lt-gem-p2">—</span>
+            XP <span id="lt-xp-p1">—</span> vs <span id="lt-xp-p2">—</span>
           </span>
         </div>
       </div>
@@ -824,7 +824,7 @@
   </span>
   <span id="status-msg">Enter player info and press Generate</span>
   <span style="margin-left:auto; color: var(--text-secondary);">
-    GEM IDs are display-only · No network requests made
+    XP values are display-only · No network requests made
   </span>
 </footer>
 
@@ -956,8 +956,8 @@
     const p2Hero  = document.getElementById("p2-hero").value;
     const p1Score = document.getElementById("p1-score").value;
     const p2Score = document.getElementById("p2-score").value;
-    const p1Gem   = document.getElementById("p1-gem").value.trim() || "—";
-    const p2Gem   = document.getElementById("p2-gem").value.trim() || "—";
+    const p1Xp    = document.getElementById("p1-xp").value.trim() || "—";
+    const p2Xp    = document.getElementById("p2-xp").value.trim() || "—";
     const event   = document.getElementById("event-name").value.trim() || "Event";
     const round   = document.getElementById("round-name").value.trim() || "Round";
     const format  = document.getElementById("format-name").value;
@@ -972,8 +972,8 @@
     document.getElementById("lt-event").textContent    = event;
     document.getElementById("lt-round").textContent    = round;
     document.getElementById("lt-format").innerHTML     = `<span>${format}</span>`;
-    document.getElementById("lt-gem-p1").textContent   = p1Gem;
-    document.getElementById("lt-gem-p2").textContent   = p2Gem;
+    document.getElementById("lt-xp-p1").textContent    = p1Xp;
+    document.getElementById("lt-xp-p2").textContent    = p2Xp;
 
     // slt-* (secondary lower third)
     document.getElementById("slt-p1-name").textContent  = p1Name;
@@ -1182,7 +1182,7 @@
   //  clearAll — reset every input field
   // ============================================================
   function clearAll() {
-    ["p1-name", "p2-name", "p1-gem", "p2-gem", "event-name", "round-name"].forEach(id => {
+    ["p1-name", "p2-name", "p1-xp", "p2-xp", "event-name", "round-name"].forEach(id => {
       document.getElementById(id).value = "";
     });
     document.getElementById("p1-score").value = "0";
