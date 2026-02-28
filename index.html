@@ -408,6 +408,146 @@
 
     /* optgroup styling (best-effort) */
     select optgroup, select option { background: var(--bg-app); color: var(--text-primary); }
+
+    /* ══════════════════════════════════════════════════════════
+       TAB NAVIGATION
+    ══════════════════════════════════════════════════════════ */
+    .tab-nav {
+      display: flex;
+      background: var(--bg-panel);
+      border-bottom: 2px solid var(--border);
+      padding: 0 20px;
+      gap: 2px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-size: .82rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      margin-bottom: -2px;
+      padding: 10px 18px;
+      text-transform: uppercase;
+      transition: color .15s, border-color .15s;
+    }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn--active { border-bottom-color: var(--accent); color: var(--text-primary); }
+
+    /* ══════════════════════════════════════════════════════════
+       CARDS IN HAND — control panel elements
+    ══════════════════════════════════════════════════════════ */
+    .cih-textarea {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      line-height: 1.5;
+      padding: 8px 10px;
+      resize: vertical;
+      width: 100%;
+    }
+    .cih-textarea:focus { border-color: var(--border-focus); outline: none; }
+
+    .cih-card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .cih-empty-hint { color: var(--text-secondary); font-size: .75rem; font-style: italic; }
+
+    .cih-card-row {
+      align-items: center;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      display: flex;
+      font-size: .8rem;
+      gap: 6px;
+      padding: 5px 8px;
+    }
+    .cih-card-row--active-p1 { background: var(--p1-color-dark); border-color: var(--p1-color); color: var(--p1-accent); }
+    .cih-card-row--active-p2 { background: var(--p2-color-dark); border-color: var(--p2-color); color: var(--p2-accent); }
+    .cih-card-name { flex: 1; }
+    .cih-card-counter { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .cih-counter-val {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      min-width: 36px;
+      text-align: center;
+      font-size: .78rem;
+      color: var(--text-secondary);
+    }
+    .cih-card-row--active-p1 .cih-counter-val,
+    .cih-card-row--active-p2 .cih-counter-val { color: inherit; }
+    .cih-adj-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-size: .9rem;
+      font-weight: 700;
+      line-height: 1;
+      padding: 1px 7px;
+    }
+    .cih-adj-btn:hover:not(:disabled) { border-color: var(--border-focus); }
+    .cih-adj-btn:disabled { opacity: .35; cursor: default; }
+
+    /* ══════════════════════════════════════════════════════════
+       CARDS IN HAND — stream graphic  (cih-*)
+    ══════════════════════════════════════════════════════════ */
+    .cih-container {
+      width: 100%;
+      max-width: 960px;
+      background: #000;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.6);
+    }
+    .cih-bar {
+      display: flex;
+      align-items: stretch;
+      background: var(--lt-bg);
+      min-height: 80px;
+    }
+    .cih-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 14px;
+      gap: 8px;
+    }
+    .cih-side--p1 {
+      border-left: 5px solid var(--p1-color);
+      background: linear-gradient(135deg, rgba(37,99,235,.12) 0%, transparent 70%);
+    }
+    .cih-side--p2 {
+      border-right: 5px solid var(--p2-color);
+      background: linear-gradient(225deg, rgba(234,88,12,.12) 0%, transparent 70%);
+      align-items: flex-end;
+    }
+    .cih-side-header { display: flex; align-items: baseline; gap: 10px; }
+    .cih-side--p2 .cih-side-header { flex-direction: row-reverse; }
+    .cih-side-name { font-size: .82rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    .cih-side--p1 .cih-side-name { color: var(--p1-accent); }
+    .cih-side--p2 .cih-side-name { color: var(--p2-accent); }
+    .cih-hand-count { font-size: .65rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-secondary); }
+    .cih-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .cih-side--p2 .cih-chips { justify-content: flex-end; }
+    .cih-chip { border-radius: 4px; font-size: .68rem; font-weight: 600; letter-spacing: .04em; padding: 3px 8px; }
+    .cih-chip--p1 { background: var(--p1-color-dark); color: var(--p1-accent); }
+    .cih-chip--p2 { background: var(--p2-color-dark); color: var(--p2-accent); }
+    .cih-no-cards { color: var(--text-secondary); font-size: .68rem; font-style: italic; }
+    .cih-divider { background: var(--lt-divider); flex-shrink: 0; width: 1px; }
   </style>
 </head>
 <body>
@@ -418,7 +558,17 @@
   <span class="subtitle">Flesh and Blood · Tournament Broadcast Tool</span>
 </header>
 
-<div class="app-body">
+<!-- ── TAB NAVIGATION ──────────────────────────────────────── -->
+<nav class="tab-nav" role="tablist">
+  <button class="tab-btn tab-btn--active" id="tab-btn-lt"
+    role="tab" aria-selected="true" aria-controls="app-body-lt"
+    onclick="switchTab('lt')">Lower Third</button>
+  <button class="tab-btn" id="tab-btn-cih"
+    role="tab" aria-selected="false" aria-controls="app-body-cih"
+    onclick="switchTab('cih')">Cards in Hand</button>
+</nav>
+
+<div class="app-body" id="app-body-lt">
 
   <!-- ── CONTROL PANEL ─────────────────────────────────────── -->
   <aside class="control-panel">
@@ -562,7 +712,111 @@
     </div>
 
   </main>
-</div>
+</div><!-- /#app-body-lt -->
+
+<!-- ══════════════════════════════════════════════════════════
+     CARDS IN HAND — tab body (hidden by default)
+══════════════════════════════════════════════════════════ -->
+<div class="app-body" id="app-body-cih" hidden>
+
+  <!-- ── CIH CONTROL PANEL ──────────────────────────────── -->
+  <aside class="control-panel">
+
+    <!-- P1 Deck Import -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <span class="player-badge p1-badge">Player 1 · Blue · Decklist</span>
+      </div>
+      <div class="field-group">
+        <label for="cih-deck-p1">Paste decklist (one card per line)</label>
+        <textarea id="cih-deck-p1" class="cih-textarea" rows="6"
+          placeholder="3 Enlightened Strike&#10;2 Pummel&#10;1x Command and Conquer"
+          spellcheck="false"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="loadDeck(0)">Load P1 Deck</button>
+        <button class="btn btn-secondary" onclick="clearDeck(0)">Clear</button>
+      </div>
+    </div>
+
+    <!-- P2 Deck Import -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <span class="player-badge p2-badge">Player 2 · Orange · Decklist</span>
+      </div>
+      <div class="field-group">
+        <label for="cih-deck-p2">Paste decklist (one card per line)</label>
+        <textarea id="cih-deck-p2" class="cih-textarea" rows="6"
+          placeholder="3 Enlightened Strike&#10;2 Pummel&#10;1x Command and Conquer"
+          spellcheck="false"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="loadDeck(1)">Load P2 Deck</button>
+        <button class="btn btn-secondary" onclick="clearDeck(1)">Clear</button>
+      </div>
+    </div>
+
+    <!-- P1 Card Counters -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <span class="player-badge p1-badge">P1 Hand</span>
+      </div>
+      <div class="cih-card-list" id="cih-card-list-p1">
+        <span class="cih-empty-hint">Load a decklist above</span>
+      </div>
+    </div>
+
+    <!-- P2 Card Counters -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <span class="player-badge p2-badge">P2 Hand</span>
+      </div>
+      <div class="cih-card-list" id="cih-card-list-p2">
+        <span class="cih-empty-hint">Load a decklist above</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── CIH PREVIEW AREA ───────────────────────────────── -->
+  <main class="preview-area">
+
+    <div class="preview-section">
+      <div class="preview-label">Cards in Hand · Stream Graphic</div>
+      <div class="cih-container" id="cih-preview">
+        <div class="cih-bar">
+
+          <!-- Player 1 side (left / blue) -->
+          <div class="cih-side cih-side--p1">
+            <div class="cih-side-header">
+              <span class="cih-side-name" id="cih-gfx-p1-name">PLAYER 1</span>
+              <span class="cih-hand-count" id="cih-gfx-p1-count">0 cards</span>
+            </div>
+            <div class="cih-chips" id="cih-gfx-p1-chips">
+              <span class="cih-no-cards">No cards in hand</span>
+            </div>
+          </div>
+
+          <div class="cih-divider"></div>
+
+          <!-- Player 2 side (right / orange) -->
+          <div class="cih-side cih-side--p2">
+            <div class="cih-side-header">
+              <span class="cih-side-name" id="cih-gfx-p2-name">PLAYER 2</span>
+              <span class="cih-hand-count" id="cih-gfx-p2-count">0 cards</span>
+            </div>
+            <div class="cih-chips" id="cih-gfx-p2-chips">
+              <span class="cih-no-cards">No cards in hand</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</div><!-- /#app-body-cih -->
 
 <footer class="status-bar">
   <span class="status-item">
@@ -575,6 +829,14 @@
 </footer>
 
 <script>
+  // ============================================================
+  //  CARDS IN HAND — state
+  //  deckState[p] = [{name, qty, inHand}]  (p: 0=P1, 1=P2)
+  //  qty    = total copies in deck
+  //  inHand = copies currently held in hand (0..qty)
+  // ============================================================
+  const deckState = [[], []];
+
   // ============================================================
   //  HEROES — single source of truth for all hero data
   //  Shape: { name, title, class, talent }
@@ -724,6 +986,175 @@
   }
 
   // ============================================================
+  //  escapeHtml — prevent XSS when inserting user-pasted card names
+  // ============================================================
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g,  '&lt;')
+      .replace(/>/g,  '&gt;')
+      .replace(/"/g,  '&quot;');
+  }
+
+  // ============================================================
+  //  switchTab — toggle between 'lt' and 'cih' workspace panels
+  // ============================================================
+  function switchTab(tab) {
+    document.getElementById('app-body-lt').hidden  = (tab !== 'lt');
+    document.getElementById('app-body-cih').hidden = (tab !== 'cih');
+
+    const ltBtn  = document.getElementById('tab-btn-lt');
+    const cihBtn = document.getElementById('tab-btn-cih');
+    ltBtn.classList.toggle('tab-btn--active',  tab === 'lt');
+    ltBtn.setAttribute('aria-selected',  String(tab === 'lt'));
+    cihBtn.classList.toggle('tab-btn--active', tab === 'cih');
+    cihBtn.setAttribute('aria-selected', String(tab === 'cih'));
+
+    if (tab === 'cih') updateHandGraphic();
+  }
+
+  // ============================================================
+  //  parseDeckText — convert pasted decklist to [{name, qty}]
+  //  Accepts: "3 Card Name"  or  "1x Card Name"
+  //  Merges duplicate card names by summing quantities.
+  // ============================================================
+  function parseDeckText(rawText) {
+    const map = {};
+    for (const raw of rawText.split('\n')) {
+      const line = raw.trim();
+      if (!line) continue;
+      const match = line.match(/^(\d+)[xX]?\s+(.+)$/);
+      if (!match) continue;
+      const qty  = Math.min(parseInt(match[1], 10), 40);
+      const name = match[2].trim();
+      map[name]  = (map[name] || 0) + qty;
+    }
+    return Object.entries(map).map(([name, qty]) => ({ name, qty }));
+  }
+
+  // ============================================================
+  //  loadDeck — read textarea, parse, store state, render list
+  // ============================================================
+  function loadDeck(playerIndex) {
+    const id  = playerIndex === 0 ? 'cih-deck-p1' : 'cih-deck-p2';
+    const raw = document.getElementById(id).value;
+    const parsed = parseDeckText(raw);
+    deckState[playerIndex] = parsed.map(c => ({ name: c.name, qty: c.qty, inHand: 0 }));
+    renderCardList(playerIndex);
+    updateHandGraphic();
+    const label = playerIndex === 0 ? 'P1' : 'P2';
+    setStatus(label + ' deck loaded · ' + deckState[playerIndex].length + ' unique cards');
+  }
+
+  // ============================================================
+  //  clearDeck — reset one player's deck and hand
+  // ============================================================
+  function clearDeck(playerIndex) {
+    deckState[playerIndex] = [];
+    renderCardList(playerIndex);
+    updateHandGraphic();
+    const label = playerIndex === 0 ? 'P1' : 'P2';
+    setStatus(label + ' deck cleared');
+  }
+
+  // ============================================================
+  //  renderCardList — rebuild the counter rows for one player
+  // ============================================================
+  function renderCardList(playerIndex) {
+    const listId    = playerIndex === 0 ? 'cih-card-list-p1' : 'cih-card-list-p2';
+    const container = document.getElementById(listId);
+    const cards     = deckState[playerIndex];
+    const activeClass = playerIndex === 0 ? 'cih-card-row--active-p1' : 'cih-card-row--active-p2';
+
+    container.innerHTML = '';
+
+    if (cards.length === 0) {
+      container.innerHTML = '<span class="cih-empty-hint">Load a decklist above</span>';
+      return;
+    }
+
+    cards.forEach((card, i) => {
+      const row = document.createElement('div');
+      row.className = 'cih-card-row' + (card.inHand > 0 ? ' ' + activeClass : '');
+      row.dataset.cardIndex = i;
+      row.dataset.player    = playerIndex;
+
+      const minusDisabled = card.inHand === 0      ? ' disabled' : '';
+      const plusDisabled  = card.inHand === card.qty ? ' disabled' : '';
+
+      row.innerHTML =
+        '<span class="cih-card-name">' + escapeHtml(card.name) + '</span>' +
+        '<div class="cih-card-counter">' +
+          '<button class="cih-adj-btn"' + minusDisabled +
+            ' onclick="adjustHand(' + playerIndex + ',' + i + ',-1)">−</button>' +
+          '<span class="cih-counter-val">' + card.inHand + ' / ' + card.qty + '</span>' +
+          '<button class="cih-adj-btn"' + plusDisabled +
+            ' onclick="adjustHand(' + playerIndex + ',' + i + ',1)">+</button>' +
+        '</div>';
+
+      container.appendChild(row);
+    });
+  }
+
+  // ============================================================
+  //  adjustHand — increment or decrement one card's inHand count
+  //  Surgically updates the affected row without re-rendering all.
+  // ============================================================
+  function adjustHand(playerIndex, cardIndex, delta) {
+    const card = deckState[playerIndex][cardIndex];
+    if (!card) return;
+    card.inHand = Math.max(0, Math.min(card.qty, card.inHand + delta));
+
+    // Find and update only this row
+    const listId      = playerIndex === 0 ? 'cih-card-list-p1' : 'cih-card-list-p2';
+    const activeClass = playerIndex === 0 ? 'cih-card-row--active-p1' : 'cih-card-row--active-p2';
+    const row = document.querySelector('#' + listId + ' [data-card-index="' + cardIndex + '"]');
+    if (row) {
+      row.classList.toggle(activeClass, card.inHand > 0);
+      const counter  = row.querySelector('.cih-counter-val');
+      const btns     = row.querySelectorAll('.cih-adj-btn');
+      if (counter) counter.textContent = card.inHand + ' / ' + card.qty;
+      if (btns[0]) btns[0].disabled = (card.inHand === 0);
+      if (btns[1]) btns[1].disabled = (card.inHand === card.qty);
+    }
+
+    updateHandGraphic();
+  }
+
+  // ============================================================
+  //  updateHandGraphic — rebuild the cih-gfx-* stream graphic
+  //  Player names are read from the shared LT-tab inputs.
+  // ============================================================
+  function updateHandGraphic() {
+    const p1Name = (document.getElementById('p1-name').value.trim() || 'Player 1').toUpperCase();
+    const p2Name = (document.getElementById('p2-name').value.trim() || 'Player 2').toUpperCase();
+    document.getElementById('cih-gfx-p1-name').textContent = p1Name;
+    document.getElementById('cih-gfx-p2-name').textContent = p2Name;
+
+    [0, 1].forEach(p => {
+      const hand     = deckState[p].filter(c => c.inHand > 0);
+      const total    = hand.reduce((s, c) => s + c.inHand, 0);
+      const countId  = p === 0 ? 'cih-gfx-p1-count'  : 'cih-gfx-p2-count';
+      const chipsId  = p === 0 ? 'cih-gfx-p1-chips'  : 'cih-gfx-p2-chips';
+      const chipCls  = p === 0 ? 'cih-chip--p1'       : 'cih-chip--p2';
+
+      document.getElementById(countId).textContent = total === 1 ? '1 card' : total + ' cards';
+
+      const chipsEl = document.getElementById(chipsId);
+      if (hand.length === 0) {
+        chipsEl.innerHTML = '<span class="cih-no-cards">No cards in hand</span>';
+      } else {
+        chipsEl.innerHTML = hand.map(c => {
+          const label = c.inHand > 1
+            ? escapeHtml(c.name) + ' <span style="opacity:.65">×' + c.inHand + '</span>'
+            : escapeHtml(c.name);
+          return '<span class="cih-chip ' + chipCls + '">' + label + '</span>';
+        }).join('');
+      }
+    });
+  }
+
+  // ============================================================
   //  exportGraphic — stub; requires html2canvas
   //  TODO: load html2canvas (CDN or local) then remove the guard
   // ============================================================
@@ -784,6 +1215,11 @@
   // ============================================================
   document.querySelectorAll("input, select").forEach(el => {
     el.addEventListener("input", generateGraphic);
+  });
+
+  // Keep CIH graphic player names in sync when LT-tab names change
+  ['p1-name', 'p2-name'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateHandGraphic);
   });
 
   // Initial render
