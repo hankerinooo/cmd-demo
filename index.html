@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FaB Lower Third Generator</title>
+  <style>
+    :root {
+      /* App chrome */
+      --bg-app:           #1a1a2e;
+      --bg-panel:         #16213e;
+      --bg-card:          #0f3460;
+      --bg-input:         #1a1a2e;
+      --border:           #2a2a5a;
+      --border-focus:     #5a5aaa;
+
+      /* Text */
+      --text-primary:     #e0e0f0;
+      --text-secondary:   #8888aa;
+      --text-label:       #aaaacc;
+
+      /* Player 1 — always blue / left */
+      --p1-color:         #2563eb;
+      --p1-color-light:   #3b82f6;
+      --p1-color-dark:    #1d4ed8;
+      --p1-accent:        #60a5fa;
+
+      /* Player 2 — always orange / right */
+      --p2-color:         #ea580c;
+      --p2-color-light:   #f97316;
+      --p2-color-dark:    #c2410c;
+      --p2-accent:        #fb923c;
+
+      /* Lower-third canvas */
+      --lt-bg:            #0d0d1a;
+      --lt-bg-alt:        #111128;
+      --lt-divider:       #333355;
+      --lt-score-bg:      #111122;
+
+      /* UI accents */
+      --accent:           #7c3aed;
+      --accent-hover:     #6d28d9;
+      --success:          #10b981;
+      --warning:          #f59e0b;
+
+      /* Typography */
+      --font-ui:          'Segoe UI', system-ui, sans-serif;
+      --font-mono:        'Courier New', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .app-header {
+      background: var(--bg-panel);
+      border-bottom: 2px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .app-header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: .05em; }
+    .app-header .subtitle { font-size: .8rem; color: var(--text-secondary); }
+    .header-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+
+    /* ── Layout ──────────────────────────────────────────────── */
+    .app-body { display: flex; flex: 1; }
+
+    .control-panel {
+      width: 380px;
+      min-width: 340px;
+      background: var(--bg-panel);
+      border-right: 2px solid var(--border);
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .preview-area {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      overflow-y: auto;
+    }
+
+    /* ── Form sections ───────────────────────────────────────── */
+    .form-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .form-section-title {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .player-badge {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .p1-badge { background: var(--p1-color-dark); color: var(--p1-accent); }
+    .p2-badge { background: var(--p2-color-dark); color: var(--p2-accent); }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .field-group:last-child { margin-bottom: 0; }
+
+    label { font-size: .72rem; color: var(--text-label); font-weight: 500; }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 7px 10px;
+      border-radius: 5px;
+      font-size: .85rem;
+      font-family: var(--font-ui);
+      width: 100%;
+      transition: border-color .15s;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--border-focus); }
+    input[type="number"] { width: 64px; }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .score-row label { white-space: nowrap; }
+    .score-sep { color: var(--text-secondary); font-weight: 700; font-size: 1.1rem; }
+
+    /* ── Buttons ─────────────────────────────────────────────── */
+    .btn {
+      padding: 9px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, transform .05s;
+      font-family: var(--font-ui);
+    }
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      width: 100%;
+      font-size: .95rem;
+      padding: 11px;
+    }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--border-focus); }
+
+    .btn-export { background: var(--success); color: #fff; }
+    .btn-export:hover { opacity: .88; }
+
+    .btn-row { display: flex; gap: 8px; }
+    .btn-row .btn { flex: 1; }
+
+    .shortcut-hint {
+      text-align: center;
+      font-size: .68rem;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+    kbd {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0 4px;
+      font-family: var(--font-mono);
+      font-size: .68rem;
+    }
+
+    /* ── Preview labels ──────────────────────────────────────── */
+    .preview-section { display: flex; flex-direction: column; gap: 8px; }
+    .preview-label {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-secondary);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       MAIN LOWER THIRD  (lt-*)
+    ══════════════════════════════════════════════════════════ */
+    .lt-container {
+      width: 100%;
+      max-width: 960px;
+      background: #000;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.6);
+    }
+
+    .lt-bar {
+      display: flex;
+      align-items: stretch;
+      background: var(--lt-bg);
+      height: 72px;
+    }
+
+    .lt-p1 {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10px 16px;
+      border-left: 5px solid var(--p1-color);
+      background: linear-gradient(135deg, rgba(37,99,235,.15) 0%, transparent 60%);
+    }
+    .lt-p2 {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      padding: 10px 16px;
+      border-right: 5px solid var(--p2-color);
+      background: linear-gradient(225deg, rgba(234,88,12,.15) 0%, transparent 60%);
+    }
+
+    .lt-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+    .lt-hero {
+      font-size: .72rem;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      margin-top: 2px;
+      color: var(--text-secondary);
+    }
+    .lt-p1 .lt-name { color: var(--p1-accent); }
+    .lt-p2 .lt-name { color: var(--p2-accent); text-align: right; }
+    .lt-p2 .lt-hero { text-align: right; }
+
+    .lt-score {
+      display: flex;
+      align-items: center;
+      background: var(--lt-score-bg);
+      padding: 0 18px;
+      gap: 10px;
+      border-left: 1px solid var(--lt-divider);
+      border-right: 1px solid var(--lt-divider);
+    }
+    .lt-score-num {
+      font-size: 1.7rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      min-width: 28px;
+      text-align: center;
+      line-height: 1;
+    }
+    .lt-score-p1 { color: var(--p1-accent); }
+    .lt-score-p2 { color: var(--p2-accent); }
+    .lt-score-sep { color: var(--lt-divider); font-size: 1.2rem; font-weight: 300; }
+
+    .lt-info-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--lt-bg-alt);
+      border-top: 1px solid var(--lt-divider);
+      padding: 5px 12px;
+      gap: 14px;
+    }
+    .lt-info-item {
+      font-size: .65rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .lt-info-item span { color: var(--text-primary); font-weight: 600; }
+    .lt-info-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--lt-divider);
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       SECONDARY LOWER THIRD  (slt-*)
+    ══════════════════════════════════════════════════════════ */
+    .slt-container {
+      width: 100%;
+      max-width: 960px;
+      background: #000;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.6);
+    }
+
+    .slt-bar {
+      display: flex;
+      align-items: center;
+      height: 44px;
+      background: var(--lt-bg);
+    }
+
+    .slt-edge-p1 { width: 6px; height: 100%; background: var(--p1-color); flex-shrink: 0; }
+    .slt-edge-p2 { width: 6px; height: 100%; background: var(--p2-color); flex-shrink: 0; }
+
+    .slt-name {
+      font-size: .88rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: 0 12px;
+    }
+    .slt-p1-name { color: var(--p1-accent); flex: 1; }
+    .slt-p2-name { color: var(--p2-accent); flex: 1; text-align: right; }
+
+    .slt-score-block {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 14px;
+      border-left: 1px solid var(--lt-divider);
+      border-right: 1px solid var(--lt-divider);
+      flex-shrink: 0;
+    }
+    .slt-score-num {
+      font-size: 1.15rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      min-width: 20px;
+      text-align: center;
+    }
+    .slt-score-p1 { color: var(--p1-accent); }
+    .slt-score-p2 { color: var(--p2-accent); }
+    .slt-score-sep { color: var(--lt-divider); font-size: .9rem; }
+
+    .slt-round {
+      font-size: .65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-secondary);
+      padding: 0 10px;
+      white-space: nowrap;
+    }
+
+    /* ── Status bar ──────────────────────────────────────────── */
+    .status-bar {
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      padding: 6px 20px;
+      font-size: .7rem;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+    .status-item { display: flex; align-items: center; gap: 4px; }
+
+    /* optgroup styling (best-effort) */
+    select optgroup, select option { background: var(--bg-app); color: var(--text-primary); }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <h1>FaB Lower Third</h1>
+  <span class="header-badge">Live</span>
+  <span class="subtitle">Flesh and Blood · Tournament Broadcast Tool</span>
+</header>
+
+<div class="app-body">
+
+  <!-- ── CONTROL PANEL ─────────────────────────────────────── -->
+  <aside class="control-panel">
+
+    <!-- Match Info -->
+    <div class="form-section">
+      <div class="form-section-title">Match Info</div>
+
+      <div class="field-group">
+        <label for="event-name">Event Name</label>
+        <input type="text" id="event-name" placeholder="e.g. Pro Tour Los Angeles">
+      </div>
+      <div class="field-group">
+        <label for="round-name">Round</label>
+        <input type="text" id="round-name" placeholder="e.g. Round 8  ·  Top 8">
+      </div>
+      <div class="field-group">
+        <label for="format-name">Format</label>
+        <select id="format-name">
+          <option>Classic Constructed</option>
+          <option>Blitz</option>
+          <option>Draft</option>
+          <option>Sealed</option>
+          <option>Living Legend</option>
+          <option>Commoner</option>
+          <option>Ultimate Pit Fight</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Player 1 -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <span class="player-badge p1-badge">Player 1 · Blue · Left</span>
+      </div>
+      <div class="field-group">
+        <label for="p1-name">Player Name</label>
+        <input type="text" id="p1-name" placeholder="Last, First">
+      </div>
+      <div class="field-group">
+        <label for="p1-hero">Hero</label>
+        <select id="p1-hero"></select>
+      </div>
+      <div class="field-group">
+        <label for="p1-gem">GEM Player ID</label>
+        <input type="text" id="p1-gem" placeholder="e.g. 12345">
+      </div>
+      <div class="score-row field-group">
+        <label>Score</label>
+        <input type="number" id="p1-score" min="0" max="9" value="0">
+        <span class="score-sep">–</span>
+        <input type="number" id="p2-score" min="0" max="9" value="0">
+      </div>
+    </div>
+
+    <!-- Player 2 -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <span class="player-badge p2-badge">Player 2 · Orange · Right</span>
+      </div>
+      <div class="field-group">
+        <label for="p2-name">Player Name</label>
+        <input type="text" id="p2-name" placeholder="Last, First">
+      </div>
+      <div class="field-group">
+        <label for="p2-hero">Hero</label>
+        <select id="p2-hero"></select>
+      </div>
+      <div class="field-group">
+        <label for="p2-gem">GEM Player ID</label>
+        <input type="text" id="p2-gem" placeholder="e.g. 67890">
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div>
+      <button class="btn btn-primary" onclick="generateGraphic()">
+        Generate Lower Thirds
+      </button>
+      <div class="shortcut-hint">or press <kbd>Ctrl</kbd>+<kbd>G</kbd></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-export" onclick="exportGraphic()">Export PNG</button>
+      <button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+    </div>
+
+  </aside>
+
+  <!-- ── PREVIEW AREA ──────────────────────────────────────── -->
+  <main class="preview-area">
+
+    <div class="preview-section">
+      <div class="preview-label">Main Lower Third</div>
+      <div class="lt-container" id="lt-preview">
+        <div class="lt-bar">
+          <div class="lt-p1">
+            <div class="lt-name" id="lt-p1-name">PLAYER ONE</div>
+            <div class="lt-hero" id="lt-p1-hero">Hero · Class</div>
+          </div>
+          <div class="lt-score">
+            <span class="lt-score-num lt-score-p1" id="lt-score-p1">0</span>
+            <span class="lt-score-sep">–</span>
+            <span class="lt-score-num lt-score-p2" id="lt-score-p2">0</span>
+          </div>
+          <div class="lt-p2">
+            <div class="lt-name" id="lt-p2-name">PLAYER TWO</div>
+            <div class="lt-hero" id="lt-p2-hero">Hero · Class</div>
+          </div>
+        </div>
+        <div class="lt-info-bar">
+          <span class="lt-info-item" id="lt-event">Event</span>
+          <span class="lt-info-dot"></span>
+          <span class="lt-info-item" id="lt-round">Round</span>
+          <span class="lt-info-dot"></span>
+          <span class="lt-info-item" id="lt-format"><span>Classic Constructed</span></span>
+          <span class="lt-info-dot"></span>
+          <span class="lt-info-item">
+            GEM <span id="lt-gem-p1">—</span> vs <span id="lt-gem-p2">—</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-section">
+      <div class="preview-label">Secondary Lower Third (Slim)</div>
+      <div class="slt-container" id="slt-preview">
+        <div class="slt-bar">
+          <div class="slt-edge-p1"></div>
+          <span class="slt-name slt-p1-name" id="slt-p1-name">PLAYER ONE</span>
+          <div class="slt-score-block">
+            <span class="slt-score-num slt-score-p1" id="slt-score-p1">0</span>
+            <span class="slt-score-sep">–</span>
+            <span class="slt-score-num slt-score-p2" id="slt-score-p2">0</span>
+          </div>
+          <span class="slt-name slt-p2-name" id="slt-p2-name">PLAYER TWO</span>
+          <span class="slt-round" id="slt-round">Round</span>
+          <div class="slt-edge-p2"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer class="status-bar">
+  <span class="status-item">
+    <span class="status-dot"></span> Ready
+  </span>
+  <span id="status-msg">Enter player info and press Generate</span>
+  <span style="margin-left:auto; color: var(--text-secondary);">
+    GEM IDs are display-only · No network requests made
+  </span>
+</footer>
+
+<script>
+  // ============================================================
+  //  HEROES — single source of truth for all hero data
+  //  Shape: { name, title, class, talent }
+  //  heroLabel() derives the display string — edit there, not here
+  // ============================================================
+  const HEROES = [
+    // Warrior
+    { name: "Dorinthea",    title: "Ironsong",                  class: "Warrior",         talent: null },
+    { name: "Kassai",       title: "of the Golden Sand",        class: "Warrior",         talent: "Sun" },
+    { name: "Zen",          title: "Tamer of Purpose",          class: "Warrior",         talent: null },
+    { name: "Victor Goldmane", title: "",                       class: "Warrior",         talent: null },
+
+    // Ranger
+    { name: "Lexi",         title: "Livewire",                  class: "Ranger",          talent: "Lightning" },
+    { name: "Lexi",         title: "High Mountain Ranger",      class: "Ranger",          talent: null },
+    { name: "Azalea",       title: "Ace in the Hole",           class: "Ranger",          talent: null },
+    { name: "Riptide",      title: "",                          class: "Ranger",          talent: "Ice" },
+
+    // Ninja
+    { name: "Ira",          title: "Crimson Haze",              class: "Ninja",           talent: null },
+    { name: "Katsu",        title: "",                          class: "Ninja",           talent: null },
+    { name: "Benji",        title: "the Pierced",               class: "Ninja",           talent: null },
+    { name: "Uzuri",        title: "Switchblade",               class: "Ninja",           talent: null },
+    { name: "Fai",          title: "Rising Rebellion",          class: "Ninja",           talent: "Draconic" },
+
+    // Wizard
+    { name: "Viserai",      title: "Rune Blood",                class: "Wizard",          talent: "Arcane" },
+    { name: "Kano",         title: "Dracai of Aether",          class: "Wizard",          talent: "Arcane" },
+    { name: "Iyslander",    title: "",                          class: "Wizard",          talent: "Ice" },
+
+    // Runeblade
+    { name: "Chane",        title: "Bound by Shadow",           class: "Runeblade",       talent: "Shadow" },
+    { name: "Briar",        title: "Warden of Thorns",          class: "Runeblade",       talent: "Earth" },
+    { name: "Vynnset",      title: "Iron Maiden",               class: "Runeblade",       talent: "Shadow" },
+    { name: "Levia",        title: "Shadowborn Abomination",    class: "Runeblade",       talent: "Shadow" },
+
+    // Brute
+    { name: "Rhinar",       title: "Reckless Rampage",          class: "Brute",           talent: null },
+    { name: "Kayo",         title: "Berserker Runt",            class: "Brute",           talent: null },
+    { name: "Skullcrusher", title: "",                          class: "Brute",           talent: null },
+
+    // Guardian
+    { name: "Bravo",        title: "Showstopper",               class: "Guardian",        talent: null },
+    { name: "Oldhim",       title: "Grandfather of Eternity",   class: "Guardian",        talent: "Earth" },
+    { name: "Anothos",      title: "",                          class: "Guardian",        talent: null },
+    { name: "Valda",        title: "Metrix Mechanic",           class: "Guardian",        talent: null },
+
+    // Illusionist
+    { name: "Prism",        title: "Sculptor of Arc Light",     class: "Illusionist",     talent: "Light" },
+    { name: "Prism",        title: "Awakener of Sol",           class: "Illusionist",     talent: "Light" },
+    { name: "Dromai",       title: "Ash Artist",                class: "Illusionist",     talent: "Draconic" },
+
+    // Mechanologist
+    { name: "Dash",         title: "Inventor Extraordinaire",   class: "Mechanologist",   talent: null },
+    { name: "Data Doll",    title: "MKII",                      class: "Mechanologist",   talent: null },
+    { name: "Nic Nano",     title: "",                          class: "Mechanologist",   talent: null },
+
+    // Bard
+    { name: "Melody",       title: "Sing-Along",                class: "Bard",            talent: null },
+
+    // Assassin
+    { name: "Nuu",          title: "Alluring Desire",           class: "Assassin",        talent: null },
+
+    // Shapeshifter
+    { name: "Kayo",         title: "Armed and Dangerous",       class: "Shapeshifter",    talent: null },
+
+    // Fallback
+    { name: "(Custom / TBD)", title: "",                        class: "",                talent: null },
+  ];
+
+  // Derive the display string shown in the select AND on the graphic.
+  function heroLabel(h) {
+    const parts = [h.name];
+    if (h.title) parts.push(h.title);
+    const suffix = [h.talent, h.class].filter(Boolean).join(" ");
+    if (suffix) parts.push(suffix);
+    return parts.join(" · ");
+  }
+
+  // ============================================================
+  //  Populate hero <select> elements, grouped by class
+  // ============================================================
+  function buildHeroSelect(el) {
+    const groups = {};
+    HEROES.forEach(h => {
+      const key = h.class || "Other";
+      (groups[key] = groups[key] || []).push(h);
+    });
+
+    el.innerHTML = "";
+    Object.keys(groups).sort().forEach(cls => {
+      const grp = document.createElement("optgroup");
+      grp.label = cls;
+      groups[cls].forEach(h => {
+        const opt = document.createElement("option");
+        opt.value = opt.textContent = heroLabel(h);
+        grp.appendChild(opt);
+      });
+      el.appendChild(grp);
+    });
+  }
+
+  buildHeroSelect(document.getElementById("p1-hero"));
+  buildHeroSelect(document.getElementById("p2-hero"));
+  // Default P2 to Rhinar for contrast in the initial preview
+  document.getElementById("p2-hero").value = heroLabel(
+    HEROES.find(h => h.name === "Rhinar")
+  );
+
+  // ============================================================
+  //  generateGraphic — updates lt-* AND slt-* together
+  // ============================================================
+  function generateGraphic() {
+    const p1Name  = (document.getElementById("p1-name").value.trim() || "Player 1").toUpperCase();
+    const p2Name  = (document.getElementById("p2-name").value.trim() || "Player 2").toUpperCase();
+    const p1Hero  = document.getElementById("p1-hero").value;
+    const p2Hero  = document.getElementById("p2-hero").value;
+    const p1Score = document.getElementById("p1-score").value;
+    const p2Score = document.getElementById("p2-score").value;
+    const p1Gem   = document.getElementById("p1-gem").value.trim() || "—";
+    const p2Gem   = document.getElementById("p2-gem").value.trim() || "—";
+    const event   = document.getElementById("event-name").value.trim() || "Event";
+    const round   = document.getElementById("round-name").value.trim() || "Round";
+    const format  = document.getElementById("format-name").value;
+
+    // lt-* (main lower third)
+    document.getElementById("lt-p1-name").textContent  = p1Name;
+    document.getElementById("lt-p2-name").textContent  = p2Name;
+    document.getElementById("lt-p1-hero").textContent  = p1Hero;
+    document.getElementById("lt-p2-hero").textContent  = p2Hero;
+    document.getElementById("lt-score-p1").textContent = p1Score;
+    document.getElementById("lt-score-p2").textContent = p2Score;
+    document.getElementById("lt-event").textContent    = event;
+    document.getElementById("lt-round").textContent    = round;
+    document.getElementById("lt-format").innerHTML     = `<span>${format}</span>`;
+    document.getElementById("lt-gem-p1").textContent   = p1Gem;
+    document.getElementById("lt-gem-p2").textContent   = p2Gem;
+
+    // slt-* (secondary lower third)
+    document.getElementById("slt-p1-name").textContent  = p1Name;
+    document.getElementById("slt-p2-name").textContent  = p2Name;
+    document.getElementById("slt-score-p1").textContent = p1Score;
+    document.getElementById("slt-score-p2").textContent = p2Score;
+    document.getElementById("slt-round").textContent    = round;
+
+    setStatus(`Updated · ${p1Name} vs ${p2Name} · ${round}`);
+  }
+
+  // ============================================================
+  //  exportGraphic — stub; requires html2canvas
+  //  TODO: load html2canvas (CDN or local) then remove the guard
+  // ============================================================
+  function exportGraphic() {
+    if (typeof html2canvas === "undefined") {
+      setStatus("Export unavailable — html2canvas not loaded", true);
+      alert(
+        "PNG export requires html2canvas.\n\n" +
+        "Add this before </body>:\n" +
+        '<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"><\/script>'
+      );
+      return;
+    }
+    html2canvas(document.getElementById("lt-preview"), { backgroundColor: "#000000" })
+      .then(canvas => {
+        const a = document.createElement("a");
+        a.download = "lower-third.png";
+        a.href = canvas.toDataURL("image/png");
+        a.click();
+        setStatus("Exported lower-third.png");
+      });
+  }
+
+  // ============================================================
+  //  clearAll — reset every input field
+  // ============================================================
+  function clearAll() {
+    ["p1-name", "p2-name", "p1-gem", "p2-gem", "event-name", "round-name"].forEach(id => {
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("p1-score").value = "0";
+    document.getElementById("p2-score").value = "0";
+    generateGraphic();
+    setStatus("Cleared");
+  }
+
+  // ============================================================
+  //  Status bar
+  // ============================================================
+  function setStatus(msg, isError) {
+    const el = document.getElementById("status-msg");
+    el.textContent = msg;
+    el.style.color = isError ? "var(--warning)" : "var(--text-secondary)";
+  }
+
+  // ============================================================
+  //  Keyboard shortcut: Ctrl+G → generateGraphic
+  // ============================================================
+  document.addEventListener("keydown", e => {
+    if (e.ctrlKey && e.key === "g") {
+      e.preventDefault();
+      generateGraphic();
+    }
+  });
+
+  // ============================================================
+  //  Live preview: re-generate on any input change
+  // ============================================================
+  document.querySelectorAll("input, select").forEach(el => {
+    el.addEventListener("input", generateGraphic);
+  });
+
+  // Initial render
+  generateGraphic();
+</script>
+</body>
+</html>
